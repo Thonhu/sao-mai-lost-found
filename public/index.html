@@ -25,6 +25,10 @@
       <div class="hero"><span class="eyebrow">LOST & FOUND</span><h2 data-i18n="heroTitle">Ghi nhận đồ thất lạc</h2><p data-i18n="heroText">Nhập thông tin và hình ảnh món đồ để lưu vào hệ thống Housekeeping.</p></div>
       <form id="itemForm" class="card form-card">
         <label><span data-i18n="itemName">Tên món đồ</span><input id="itemName" name="item_name" required maxlength="120"></label>
+        <label>
+  <span data-i18n="guestName">Tên khách</span>
+  <input id="guestName" name="guest_name" maxlength="160" placeholder="Tên khách nếu xác định được">
+</label>
         <label><span data-i18n="room">Phòng / khu vực</span><input id="roomNumber" name="room_number" required maxlength="80"></label>
         <label><span data-i18n="foundAt">Ngày giờ</span><input id="foundAt" name="found_at" type="datetime-local" required></label>
         <label><span data-i18n="storage">Vị trí lưu kho</span><input id="storageLocation" name="storage_location" required maxlength="160"></label>
