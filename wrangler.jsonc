@@ -1,9 +1,14 @@
 {
   "name": "sao-mai-lost-found",
+  "main": "./src/index.js",
   "compatibility_date": "2026-08-08",
 
   "assets": {
-    "directory": "./public"
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/api/*"
+    ]
   },
 
   "d1_databases": [
