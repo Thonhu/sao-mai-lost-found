@@ -2,11 +2,52 @@
 <html lang="vi">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sao Mai Lost & Found</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#8f0015">
+  <title>Sao Mai Phu My Resort | Lost & Found</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <h1>Sao Mai Resort - Lost & Found</h1>
-  <p>Housekeeping Lost & Found Management</p>
+  <header class="topbar">
+    <div class="brand"><div class="brand-mark">SM</div><div><h1>SAO MAI PHU MY RESORT</h1><p data-i18n="subtitle">Housekeeping · Quản lý đồ thất lạc</p></div></div>
+    <select id="language"><option value="vi">VI</option><option value="en">EN</option></select>
+  </header>
+  <nav class="tabs">
+    <button class="tab active" data-tab="create" data-i18n="createTab">Ghi nhận đồ thất lạc</button>
+    <button class="tab" data-tab="manage" data-i18n="manageTab">Quản lý</button>
+    <button class="tab" data-tab="rules" data-i18n="rulesTab">Quy định</button>
+  </nav>
+  <main>
+    <section id="create" class="panel active">
+      <div class="hero"><span class="eyebrow">LOST & FOUND</span><h2 data-i18n="heroTitle">Ghi nhận đồ thất lạc</h2><p data-i18n="heroText">Nhập thông tin và hình ảnh món đồ để lưu vào hệ thống Housekeeping.</p></div>
+      <form id="itemForm" class="card form-card">
+        <label><span data-i18n="itemName">Tên món đồ</span><input id="itemName" name="item_name" required maxlength="120"></label>
+        <label><span data-i18n="room">Phòng / khu vực</span><input id="roomNumber" name="room_number" required maxlength="80"></label>
+        <label><span data-i18n="foundAt">Ngày giờ</span><input id="foundAt" name="found_at" type="datetime-local" required></label>
+        <label><span data-i18n="storage">Vị trí lưu kho</span><input id="storageLocation" name="storage_location" required maxlength="160"></label>
+        <label class="full"><span data-i18n="description">Mô tả</span><textarea id="description" name="description" rows="3" maxlength="800"></textarea></label>
+        <label class="full photo-field"><span data-i18n="photo">Ảnh đồ thất lạc</span><input id="photo" name="photo" type="file" accept="image/*" capture="environment" required><div id="photoPreview" class="photo-preview hidden"></div><small data-i18n="photoHint">Chụp hoặc chọn 1 ảnh, tối đa 8 MB.</small></label>
+        <div class="actions full"><button id="createBtn" type="submit" class="primary" data-i18n="save">Lưu món đồ</button><button type="reset" class="secondary" data-i18n="reset">Nhập lại</button></div>
+      </form>
+      <section id="successBox" class="card success-box hidden"><div><span data-i18n="created">Đã ghi nhận thành công</span><strong id="createdCode"></strong></div><button id="newItemBtn" class="secondary" data-i18n="newItem">Ghi nhận món khác</button></section>
+    </section>
+    <section id="manage" class="panel">
+      <div class="card admin-card">
+        <h2 data-i18n="manageTitle">Quản lý đồ thất lạc</h2><p data-i18n="manageHint">Mở danh sách bằng PIN quản lý để cập nhật trạng thái, kho, người nhận và lịch sử.</p>
+        <div class="admin-login"><input id="adminPin" type="password" inputmode="numeric" placeholder="PIN quản lý"><button id="loadAdmin" class="primary" data-i18n="openList">Mở danh sách</button></div>
+        <div id="adminArea" class="hidden">
+          <div class="stats"><div><b id="countStored">0</b><span data-i18n="stored">Đang lưu giữ</span></div><div><b id="countReturned">0</b><span data-i18n="returned">Đã trả khách</span></div><div><b id="countDisposed">0</b><span data-i18n="disposed">Đã xử lý</span></div><div><b id="countTotal">0</b><span data-i18n="total">Tổng số</span></div></div>
+          <div class="filters"><input id="adminSearch" data-i18n-placeholder="search"><select id="statusFilter"><option value="" data-i18n="allStatuses">Tất cả trạng thái</option><option value="stored" data-i18n="stored">Đang lưu giữ</option><option value="returned" data-i18n="returned">Đã trả khách</option><option value="disposed" data-i18n="disposed">Đã xử lý</option><option value="cancelled" data-i18n="cancelled">Đã hủy</option></select><button id="refreshAdmin" class="secondary" data-i18n="refresh">Làm mới</button></div>
+          <div class="table-wrap"><table><thead><tr><th data-i18n="photo">Ảnh</th><th data-i18n="code">Mã</th><th data-i18n="itemName">Tên món đồ</th><th data-i18n="roomShort">Phòng</th><th data-i18n="foundAt">Ngày giờ</th><th data-i18n="storageShort">Kho</th><th data-i18n="status">Trạng thái</th><th data-i18n="receiver">Người nhận lại</th><th data-i18n="actions">Thao tác</th></tr></thead><tbody id="adminRows"></tbody></table></div>
+        </div>
+      </div>
+    </section>
+    <section id="rules" class="panel"><article class="card rules-card"><h2 data-i18n="rulesTitle">Quy định quản lý đồ thất lạc</h2><ol><li data-i18n="rule1">Mọi đồ thất lạc phải được ghi nhận ngay khi phát hiện, kèm hình ảnh và vị trí tìm thấy.</li><li data-i18n="rule2">Đồ thất lạc phải được bảo quản tại vị trí lưu kho đã ghi trong hệ thống.</li><li data-i18n="rule3">Chỉ bàn giao đồ khi đã xác minh người nhận phù hợp; tên người nhận phải được ghi lại.</li><li data-i18n="rule4">Mọi thay đổi trạng thái, vị trí lưu kho và việc trả đồ đều được lưu vào lịch sử.</li><li data-i18n="rule5">Việc xử lý hoặc xóa dữ liệu chỉ thực hiện bởi người có PIN quản lý.</li></ol></article></section>
+  </main>
+  <footer>© <span id="year"></span> Sao Mai Phu My Resort · Housekeeping Lost & Found</footer>
+  <script src="/app.js"></script>
 </body>
 </html>
