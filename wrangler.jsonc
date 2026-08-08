@@ -1,0 +1,23 @@
+{
+  "name": "sao-mai-lost-found",
+  "compatibility_date": "2026-08-08",
+
+  "assets": {
+    "directory": "./public"
+  },
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "sao-mai-lost-found-db",
+      "database_id": "da2c6621-5473-484b-a3bf-6e5fbef1051e"
+    }
+  ],
+
+  "r2_buckets": [
+    {
+      "binding": "PHOTOS",
+      "bucket_name": "sao-mai-lost-found-photos"
+    }
+  ]
+}
