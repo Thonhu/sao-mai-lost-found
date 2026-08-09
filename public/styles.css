@@ -40,3 +40,35 @@
   border-radius: 10px;
   border: 1px solid #e5d8cc;
 }
+.photo-preview-list,
+.photo-preview {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  width: auto;
+  height: auto;
+  border: 0;
+  background: transparent;
+}
+
+.photo-preview-list img,
+.photo-preview img {
+  width: 110px;
+  height: 85px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #e5d8cc;
+}
+
+.item-thumbs {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.item-thumbs .thumb {
+  width: 52px;
+  height: 44px;
+  object-fit: cover;
+}
