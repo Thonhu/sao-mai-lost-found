@@ -8,6 +8,9 @@ let adminItems = [];
 const historyOpen = new Set();
 const historyCache = {};
 
+const MAX_PHOTOS = 3;
+const MAX_PHOTO_SIZE = 5 * 1024 * 1024;
+
 
 /* =========================================================
    NGÔN NGỮ
@@ -41,8 +44,10 @@ const I = {
 
     description: 'Mô tả',
 
-    photo: 'Ảnh',
-    photoHint: 'Chụp hoặc chọn 1 ảnh, tối đa 8 MB.',
+    photo: 'Ảnh đồ thất lạc',
+
+    photoHint:
+      'Chụp hoặc chọn tối đa 3 ảnh, mỗi ảnh tối đa 5 MB.',
 
     save: 'Lưu món đồ',
     reset: 'Nhập lại',
@@ -121,7 +126,7 @@ const I = {
     heroTitle: 'Record a lost item',
 
     heroText:
-      'Enter the item details and photo for the Housekeeping Lost & Found system.',
+      'Enter the item details and photos for the Housekeeping Lost & Found system.',
 
     itemName: 'Item name',
 
@@ -138,8 +143,10 @@ const I = {
 
     description: 'Description',
 
-    photo: 'Photo',
-    photoHint: 'Take or choose 1 image, maximum 8 MB.',
+    photo: 'Lost item photos',
+
+    photoHint:
+      'Take or choose up to 3 images, maximum 5 MB each.',
 
     save: 'Save item',
     reset: 'Reset',
@@ -185,7 +192,7 @@ const I = {
     rulesTitle: 'Lost & Found Rules',
 
     rule1:
-      'All found property must be recorded immediately with a photo and the location where it was found.',
+      'All found property must be recorded immediately with photos and the location where it was found.',
 
     rule2:
       'Found property must be kept at the storage location recorded in the system.',
@@ -274,7 +281,7 @@ async function APIX(url, options = {}) {
 
 
 /* =========================================================
-   NGÀY GIỜ MẶC ĐỊNH
+   NGÀY GIỜ
 ========================================================= */
 
 function setDefaultTime() {
@@ -295,7 +302,7 @@ function setDefaultTime() {
 
 
 /* =========================================================
-   ĐỔI NGÔN NGỮ
+   NGÔN NGỮ
 ========================================================= */
 
 function applyLang() {
@@ -311,9 +318,7 @@ function applyLang() {
       T(el.dataset.i18n);
 
     if (value) {
-
       el.textContent = value;
-
     }
 
   });
@@ -325,9 +330,7 @@ function applyLang() {
       T(el.dataset.i18nPlaceholder);
 
     if (value) {
-
       el.placeholder = value;
-
     }
 
   });
@@ -337,10 +340,6 @@ function applyLang() {
 
 }
 
-
-/* =========================================================
-   KHỞI TẠO NGÔN NGỮ
-========================================================= */
 
 if ($('#language')) {
 
@@ -379,14 +378,8 @@ $$('.tab').forEach(btn => {
 
     btn.classList.add('active');
 
-    const panel =
-      $('#' + btn.dataset.tab);
-
-    if (panel) {
-
-      panel.classList.add('active');
-
-    }
+    $('#' + btn.dataset.tab)
+      ?.classList.add('active');
 
   };
 
@@ -394,17 +387,90 @@ $$('.tab').forEach(btn => {
 
 
 /* =========================================================
-   XEM TRƯỚC ẢNH
+   KIỂM TRA ẢNH
+========================================================= */
+
+function validatePhotos(files) {
+
+  if (!files.length) {
+
+    alert(
+      L() === 'vi'
+        ? 'Vui lòng chọn ít nhất 1 ảnh.'
+        : 'Please choose at least 1 image.'
+    );
+
+    return false;
+
+  }
+
+
+  if (files.length > MAX_PHOTOS) {
+
+    alert(
+      L() === 'vi'
+        ? 'Chỉ được chọn tối đa 3 ảnh.'
+        : 'You can select up to 3 images.'
+    );
+
+    return false;
+
+  }
+
+
+  for (const file of files) {
+
+    if (!file.type.startsWith('image/')) {
+
+      alert(
+        L() === 'vi'
+          ? `${file.name} không phải là hình ảnh.`
+          : `${file.name} is not an image.`
+      );
+
+      return false;
+
+    }
+
+
+    if (file.size > MAX_PHOTO_SIZE) {
+
+      alert(
+        L() === 'vi'
+          ? `Ảnh "${file.name}" vượt quá 5 MB.`
+          : `Image "${file.name}" exceeds 5 MB.`
+      );
+
+      return false;
+
+    }
+
+  }
+
+
+  return true;
+
+}
+
+
+/* =========================================================
+   PREVIEW TỐI ĐA 3 ẢNH
 ========================================================= */
 
 if ($('#photo')) {
 
   $('#photo').onchange = e => {
 
-    const file =
-      e.target.files?.[0];
+    const input =
+      e.target;
 
-    if (!file) {
+    const files =
+      Array.from(input.files || []);
+
+
+    if (!files.length) {
+
+      $('#photoPreview').innerHTML = '';
 
       $('#photoPreview')
         ?.classList.add('hidden');
@@ -413,15 +479,36 @@ if ($('#photo')) {
 
     }
 
-    const url =
-      URL.createObjectURL(file);
 
-    $('#photoPreview').innerHTML = `
-      <img
-        src="${url}"
-        alt="Lost item"
-      >
-    `;
+    if (!validatePhotos(files)) {
+
+      input.value = '';
+
+      $('#photoPreview').innerHTML = '';
+
+      $('#photoPreview')
+        ?.classList.add('hidden');
+
+      return;
+
+    }
+
+
+    $('#photoPreview').innerHTML =
+      files.map(file => {
+
+        const url =
+          URL.createObjectURL(file);
+
+        return `
+          <img
+            src="${url}"
+            alt="${E(file.name)}"
+          >
+        `;
+
+      }).join('');
+
 
     $('#photoPreview')
       .classList.remove('hidden');
@@ -432,7 +519,7 @@ if ($('#photo')) {
 
 
 /* =========================================================
-   TẠO MÓN ĐỒ THẤT LẠC
+   TẠO PHIẾU
 ========================================================= */
 
 if ($('#itemForm')) {
@@ -442,14 +529,28 @@ if ($('#itemForm')) {
 
       e.preventDefault();
 
+
+      const files =
+        Array.from(
+          $('#photo')?.files || []
+        );
+
+
+      if (!validatePhotos(files)) {
+        return;
+      }
+
+
       const btn =
         $('#createBtn');
 
       const oldText =
         btn.textContent;
 
+
       btn.disabled = true;
       btn.textContent = '...';
+
 
       try {
 
@@ -457,8 +558,30 @@ if ($('#itemForm')) {
           new FormData(e.currentTarget);
 
 
+        /*
+          Xóa field file tự sinh,
+          sau đó add đúng tên "photos"
+          cho cả 1–3 ảnh.
+        */
+
+        fd.delete('photo');
+        fd.delete('photos');
+
+
+        files.forEach(file => {
+
+          fd.append(
+            'photos',
+            file,
+            file.name
+          );
+
+        });
+
+
         const local =
           $('#foundAt')?.value;
+
 
         if (local) {
 
@@ -504,7 +627,9 @@ if ($('#itemForm')) {
       finally {
 
         btn.disabled = false;
-        btn.textContent = oldText;
+
+        btn.textContent =
+          oldText;
 
       }
 
@@ -517,6 +642,7 @@ if ($('#itemForm')) {
       () => {
 
         setDefaultTime();
+
 
         if ($('#photoPreview')) {
 
@@ -537,7 +663,7 @@ if ($('#itemForm')) {
 
 
 /* =========================================================
-   GHI NHẬN MÓN MỚI
+   GHI NHẬN MÓN KHÁC
 ========================================================= */
 
 if ($('#newItemBtn')) {
@@ -594,34 +720,22 @@ async function loadAdmin() {
 
 
 if ($('#loadAdmin')) {
-
-  $('#loadAdmin').onclick =
-    loadAdmin;
-
+  $('#loadAdmin').onclick = loadAdmin;
 }
 
 
 if ($('#refreshAdmin')) {
-
-  $('#refreshAdmin').onclick =
-    loadAdmin;
-
+  $('#refreshAdmin').onclick = loadAdmin;
 }
 
 
 if ($('#adminSearch')) {
-
-  $('#adminSearch').oninput =
-    render;
-
+  $('#adminSearch').oninput = render;
 }
 
 
 if ($('#statusFilter')) {
-
-  $('#statusFilter').onchange =
-    render;
-
+  $('#statusFilter').onchange = render;
 }
 
 
@@ -665,26 +779,17 @@ function translateDetail(log) {
 
 
   if (L() === 'vi') {
-
     return s;
-
   }
 
 
   if (log.action === 'created') {
-
     return 'Item recorded in the system';
-
   }
 
 
-  if (
-    log.action ===
-    'storage_changed'
-  ) {
-
+  if (log.action === 'storage_changed') {
     return 'Storage location updated';
-
   }
 
 
@@ -699,16 +804,12 @@ function translateDetail(log) {
 
 
   if (log.action === 'disposed') {
-
     return 'Item disposed';
-
   }
 
 
   if (log.action === 'restored') {
-
     return 'Status restored to Stored';
-
   }
 
 
@@ -827,9 +928,7 @@ async function loadHistory(code) {
 window.toggleHistory =
   async code => {
 
-    if (
-      historyOpen.has(code)
-    ) {
+    if (historyOpen.has(code)) {
 
       historyOpen.delete(code);
 
@@ -846,9 +945,7 @@ window.toggleHistory =
 
 
     if (!historyCache[code]) {
-
       await loadHistory(code);
-
     }
 
   };
@@ -863,9 +960,7 @@ function actionButtons(item) {
   let html = '';
 
 
-  if (
-    item.status === 'stored'
-  ) {
+  if (item.status === 'stored') {
 
     html += `
       <button
@@ -946,7 +1041,64 @@ function actionButtons(item) {
 
 
 /* =========================================================
-   HIỂN THỊ DANH SÁCH
+   HIỂN THỊ ẢNH TRONG QUẢN LÝ
+========================================================= */
+
+function photosHTML(item) {
+
+  let ids =
+    item.photo_ids || [];
+
+
+  if (typeof ids === 'string') {
+
+    ids =
+      ids
+        .split(',')
+        .map(x => Number(x))
+        .filter(Boolean);
+
+  }
+
+
+  if (!Array.isArray(ids)) {
+    ids = [];
+  }
+
+
+  if (!ids.length && item.photo_id) {
+    ids = [item.photo_id];
+  }
+
+
+  if (!ids.length) {
+    return '—';
+  }
+
+
+  return `
+    <div class="item-thumbs">
+      ${ids.map(id => `
+        <a
+          href="/api/photos/${id}"
+          target="_blank"
+          rel="noopener"
+        >
+          <img
+            class="thumb"
+            src="/api/photos/${id}"
+            alt=""
+          >
+        </a>
+      `).join('')}
+    </div>
+  `;
+
+}
+
+
+/* =========================================================
+   RENDER
 ========================================================= */
 
 function render() {
@@ -1018,7 +1170,8 @@ function render() {
           ? `
             <br>
             <small>
-              ${T('guestName')}: ${E(item.guest_name)}
+              ${T('guestName')}:
+              ${E(item.guest_name)}
             </small>
           `
           : '';
@@ -1029,21 +1182,7 @@ function render() {
         <tr>
 
           <td>
-
-            ${
-              item.photo_id
-
-                ? `
-                  <img
-                    class="thumb"
-                    src="/api/photos/${item.photo_id}"
-                    alt=""
-                  >
-                `
-
-                : '—'
-            }
-
+            ${photosHTML(item)}
           </td>
 
 
@@ -1051,12 +1190,10 @@ function render() {
             class="code-cell"
             title="${E(item.code)}"
           >
-
             …${E(
               String(item.code)
                 .slice(-4)
             )}
-
           </td>
 
 
@@ -1104,9 +1241,7 @@ function render() {
             <span
               class="status ${E(item.status)}"
             >
-
               ${E(T(item.status))}
-
             </span>
 
           </td>
@@ -1153,9 +1288,7 @@ function render() {
             <tr class="history-row">
 
               <td colspan="9">
-
                 ${historyHTML(item.code)}
-
               </td>
 
             </tr>
@@ -1208,12 +1341,8 @@ async function patch(
   await loadAdmin();
 
 
-  if (
-    historyOpen.has(code)
-  ) {
-
+  if (historyOpen.has(code)) {
     await loadHistory(code);
-
   }
 
 
@@ -1253,9 +1382,7 @@ window.moveStorage =
     }
 
     catch (err) {
-
       alert(err.message);
-
     }
 
   };
@@ -1307,16 +1434,14 @@ window.returnItem =
     }
 
     catch (err) {
-
       alert(err.message);
-
     }
 
   };
 
 
 /* =========================================================
-   ĐÃ XỬ LÝ
+   XỬ LÝ
 ========================================================= */
 
 window.disposeItem =
@@ -1326,9 +1451,7 @@ window.disposeItem =
       confirm(
 
         L() === 'vi'
-
           ? 'Xác nhận đánh dấu món đồ là Đã xử lý?'
-
           : 'Mark this item as Disposed?'
 
       );
@@ -1349,9 +1472,7 @@ window.disposeItem =
     }
 
     catch (err) {
-
       alert(err.message);
-
     }
 
   };
@@ -1368,9 +1489,7 @@ window.restoreItem =
       confirm(
 
         L() === 'vi'
-
           ? 'Khôi phục món đồ về trạng thái Đang lưu giữ?'
-
           : 'Restore item to Stored status?'
 
       );
@@ -1391,9 +1510,7 @@ window.restoreItem =
     }
 
     catch (err) {
-
       alert(err.message);
-
     }
 
   };
@@ -1411,9 +1528,9 @@ window.deleteItem =
 
         L() === 'vi'
 
-          ? `Xóa vĩnh viễn ${code} và ảnh?`
+          ? `Xóa vĩnh viễn ${code} và toàn bộ ảnh?`
 
-          : `Permanently delete ${code} and its photo?`
+          : `Permanently delete ${code} and all photos?`
 
       );
 
@@ -1446,9 +1563,7 @@ window.deleteItem =
     }
 
     catch (err) {
-
       alert(err.message);
-
     }
 
   };
