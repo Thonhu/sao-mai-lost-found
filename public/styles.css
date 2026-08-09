@@ -25,3 +25,18 @@
     gap: 12px;
   }
 }
+/* Ảnh preview đồ thất lạc */
+.photo-preview-list {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.photo-preview-list img {
+  width: 110px;
+  height: 85px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #e5d8cc;
+}
