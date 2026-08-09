@@ -12,7 +12,14 @@
 </head>
 <body>
   <header class="topbar">
-    <div class="brand"><div class="brand-mark">SM</div><div><h1>SAO MAI PHU MY RESORT</h1><p data-i18n="subtitle">Housekeeping · Quản lý đồ thất lạc</p></div></div>
+    <div class="brand">
+  <img src="/sao-mai-logo.jpg" alt="Sao Mai Phu My Resort" class="brand-logo">
+
+  <div>
+    <h1>SAO MAI PHU MY RESORT</h1>
+    <p data-i18n="subtitle">Housekeeping · Quản lý đồ thất lạc</p>
+  </div>
+</div>
     <select id="language"><option value="vi">VI</option><option value="en">EN</option></select>
   </header>
   <nav class="tabs">
@@ -33,7 +40,24 @@
         <label><span data-i18n="foundAt">Ngày giờ</span><input id="foundAt" name="found_at" type="datetime-local" required></label>
         <label><span data-i18n="storage">Vị trí lưu kho</span><input id="storageLocation" name="storage_location" required maxlength="160"></label>
         <label class="full"><span data-i18n="description">Mô tả</span><textarea id="description" name="description" rows="3" maxlength="800"></textarea></label>
-        <label class="full photo-field"><span data-i18n="photo">Ảnh đồ thất lạc</span><input id="photo" name="photo" type="file" accept="image/*" capture="environment" required><div id="photoPreview" class="photo-preview hidden"></div><small data-i18n="photoHint">Chụp hoặc chọn 1 ảnh, tối đa 8 MB.</small></label>
+       <label class="full photo-field">
+  <span data-i18n="photo">Ảnh đồ thất lạc</span>
+
+  <input
+    id="photo"
+    name="photos"
+    type="file"
+    accept="image/*"
+    multiple
+    required
+  >
+
+  <div id="photoPreview" class="photo-preview-list hidden"></div>
+
+  <small data-i18n="photoHint">
+    Chụp hoặc chọn tối đa 3 ảnh, mỗi ảnh tối đa 8 MB.
+  </small>
+</label>
         <div class="actions full"><button id="createBtn" type="submit" class="primary" data-i18n="save">Lưu món đồ</button><button type="reset" class="secondary" data-i18n="reset">Nhập lại</button></div>
       </form>
       <section id="successBox" class="card success-box hidden"><div><span data-i18n="created">Đã ghi nhận thành công</span><strong id="createdCode"></strong></div><button id="newItemBtn" class="secondary" data-i18n="newItem">Ghi nhận món khác</button></section>
